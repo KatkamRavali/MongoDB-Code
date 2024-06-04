@@ -8,6 +8,13 @@ const { users } = require("../Data/users.json");
 // const modelIndex = require("../Modals/index.js");
 //  --- Or ----
 const { userModel, BookModel } = require("../Modals/index.js");
+const {
+  getAllUsers,
+  getSingleUserById,
+  addNewUser,
+  updateUserById,
+  deleteUserById,
+} = require("../Controllers/users-controller.js");
 
 const routerUser = express.Router(); // Importing
 
@@ -20,12 +27,8 @@ const routerUser = express.Router(); // Importing
  * Access : Public
  * Parameters : None
  */
-routerUser.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    Data: users, // This the Data: json File name
-  });
-});
+
+routerUser.get("/", getAllUsers);
 
 // --------------------------------------------------------------------------------------------------------------
 
@@ -36,22 +39,7 @@ routerUser.get("/", (req, res) => {
  * Access : Public
  * Parameters : Id
  */
-routerUser.get("/:id", (req, res) => {
-  const { id } = req.params; // or const id = req.params.id;
-  const userDetail = users.find((each) => each.id === id);
-  if (!userDetail) {
-    return res.status(400).json({
-      success: false,
-      message: "User does not exist ....!", // This the Data: json File name
-    });
-  } else {
-    return res.status(200).json({
-      success: true,
-      message: "User found .... :-)",
-      Data: userDetail,
-    });
-  }
-});
+routerUser.get("/:id", getSingleUserById);
 
 // --------------------------------------------------------------------------------------------------------------
 
@@ -62,32 +50,7 @@ routerUser.get("/:id", (req, res) => {
  * Access : Public
  * Parameters : None
  */
-routerUser.post("/", (req, res) => {
-  const { id, name, surname, email, subscriptionType, subscriptionDate } =
-    req.body;
-
-  const newUser = users.find((each) => each.id === id);
-  if (newUser) {
-    return res.status(404).json({
-      success: false,
-      message: "User with this is alreay exist",
-    });
-  }
-  users.push({
-    id,
-    name,
-    surname,
-    email,
-    subscriptionType,
-    subscriptionDate,
-  });
-  return res.status(201).json({
-    success: true,
-    message: "User got Updated successfully",
-    // Data: newUser, [just the above content is displayed]
-    Data: users, // [The above content and the content we added is displayed]
-  });
-});
+routerUser.post("/", addNewUser);
 
 // --------------------------------------------------------------------------------------------------------------
 
@@ -98,32 +61,7 @@ routerUser.post("/", (req, res) => {
  * Access : Public
  * Parameters : id
  */
-routerUser.put("/:id", (req, res) => {
-  const { id } = req.params;
-  const { data } = req.body;
-
-  const userDetail = users.find((each) => each.id === id);
-  if (!userDetail) {
-    return res.status(400).json({
-      success: false,
-      message: "User does not exist ....!",
-    });
-  }
-  const updateUser = users.map((each) => {
-    if (each.id === id) {
-      return {
-        ...each, // indicates each element or key in a body
-        ...data, // indicates the data in the body
-      };
-    }
-    return each;
-  });
-  return res.status(201).json({
-    success: true,
-    message: "User updated ....!",
-    Data: updateUser,
-  });
-});
+routerUser.put("/:id", updateUserById);
 
 // --------------------------------------------------------------------------------------------------------------
 
@@ -134,26 +72,7 @@ routerUser.put("/:id", (req, res) => {
  * Access : Public
  * Parameters : id
  */
-routerUser.delete("/:id", (req, res) => {
-  const { id } = req.params;
-
-  const userDetail = users.find((each) => each.id === id);
-  if (!userDetail) {
-    return res.status(400).json({
-      success: false,
-      message: "User does not exist ....!",
-    });
-  } else {
-    const index = users.indexOf(userDetail);
-    users.splice(index, 1);
-
-    return res.status(200).json({
-      success: true,
-      message: "User deleted successfully ....!",
-      Data: users,
-    });
-  }
-});
+routerUser.delete("/:id", deleteUserById);
 
 // --------------------------------------------------------------------------------------------------------------
 
