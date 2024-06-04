@@ -2,6 +2,13 @@ const express = require("express");
 const { users } = require("../Data/users.json");
 // {users} here { } are helpfully when we call multiple arrays in the json file
 
+// const userModel = require("../Modals/users-modals");
+// const BookModel = require("../Modals/books-modal");
+//  --- Or ----
+// const modelIndex = require("../Modals/index.js");
+//  --- Or ----
+const { userModel, BookModel } = require("../Modals/index.js");
+
 const routerUser = express.Router(); // Importing
 
 // --------------------------------------------------------------------------------------------------------------
