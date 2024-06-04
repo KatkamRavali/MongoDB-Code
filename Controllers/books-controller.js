@@ -281,4 +281,6 @@ module.exports = {
  * exports.getAllBooks = () => {};
  * exports.getSingleBookById = () => {};
  * exports.getAllIssuedBooks = () => {};
+ * exports.addNewBook = () => {};
+ * exports.updateBookById = () => {};
  */
