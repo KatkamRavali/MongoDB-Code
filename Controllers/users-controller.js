@@ -66,7 +66,7 @@ const getAllUsers = async (req, res) => {
 });
 */
 
-const getSingleUserById = async (re, res) => {
+const getSingleUserById = async (req, res) => {
   const { id } = req.params; // const id = req.params.id;
   const userById = await userModel.findById(id);
   //   const userById = await userModel.findById({ _id: id });
@@ -121,30 +121,49 @@ const getSingleUserById = async (re, res) => {
 });
 */
 
-const addNewUser = async (req, res) => {
-  const { Data } = req.body;
-  //  This is for if we dont pass any data
-  if (!Data) {
-    return res.status(404).json({
-      success: false,
-      message: "No data to add a user",
-    });
-  }
-  //   const newUser =
-  await userModel.create(Data);
-  const allUsers = await userModel.find();
+// const addNewUser = async (req, res) => {
+//   const { Data } = req.body;
+//   //  This is for if we dont pass any data
+//   if (!Data) {
+//     return res.status(404).json({
+//       success: false,
+//       message: "No data to add a user",
+//     });
+//   }
+//   //   const newUser =
+//   await userModel.create(Data);
+//   const allUsers = await userModel.find();
 
-  //   if (newUser) {
-  //     return res.status(404).json({
-  //       success: false,
-  //       message: "User with this id already exist",
-  //     });
-  //   }
+//   //   if (newUser) {
+//   //     return res.status(404).json({
+//   //       success: false,
+//   //       message: "User with this id already exist",
+//   //     });
+//   //   }
+
+//   return res.status(201).json({
+//     success: true,
+//     message: "User got added successfully",
+//     Data: allUsers,
+//   });
+// };
+
+const addNewUser = async (req, res) => {
+  const { id, name, surname, email, subscriptionType, subscriptionDate } =
+    req.body;
+
+  const newUser = await userModel.create({
+    name,
+    surname,
+    email,
+    subscriptionType,
+    subscriptionDate,
+  });
 
   return res.status(201).json({
     success: true,
     message: "User got added successfully",
-    Data: allUsers,
+    Data: newUser,
   });
 };
 
@@ -259,9 +278,164 @@ const deleteUserById = async (req, res) => {
   return res.status(200).json({
     success: true,
     message: "User deleted successfully ....!",
-    Data: users,
   });
 };
+
+// ------------------------------------------------------------------------------------------------------
+/**
+ * Route : /subscription-details/:id
+ * Method : GET
+ * Description : Get all user subscription details using id
+ * Access : Public
+ * Parameters : id
+ */
+
+/**
+routerUser.get("/subscription-details/:id", (req, res) => {
+  const { id } = req.params; // To get id
+  const subscriptionDetails = users.find((each) => each.id === id); // Find whether the id exist or not
+
+  if (!subscriptionDetails) {
+    return res.status(400).json({
+      success: false,
+      message: "User with the id doesnot exist",
+    });
+  }
+
+  //  To get the no of days
+  const getDateInDays = (Data = "") => {
+    // This is for getting the subscription date in days
+    let date; // Assiging a variable
+    if (Data === "") {
+      //  If we have date as blank we will consider this
+      date = new Date();
+    } else {
+      //  If we have date we will return the same date in this condition
+      date = new Date(Data);
+    }
+    // 12hr => 12*60 mins              &&           155mins => 155/60
+    let days = Math.floor(date / (1000 * 60 * 60 * 24)); // floor example:- 2.7 = 2   &&    seal example:- 2.7 = 3
+    // To convert into days  [1000ms * 60sec * 60min * 24hr]
+    return days;
+  };
+  const subscriptionType = (date) => {
+    // if (subscriptionDetails.subscriptionType === "Basic") {
+    //   date = date + 30;
+    // } else
+    if (subscriptionDetails.subscriptionType === "Basic") {
+      date = date + 90;
+    } else if (subscriptionDetails.subscriptionType === "Standard") {
+      date = date + 180;
+    } else if (subscriptionDetails.subscriptionType === "Premium") {
+      date = date + 365;
+    }
+    return date;
+  };
+
+  //  Jan 1 1970 UTC
+  let returnDate = getDateInDays(subscriptionDetails.returnDate);
+  let currentDate = getDateInDays();
+  let subscriptionDate = getDateInDays(subscriptionDetails.subscriptionDate);
+  let subscriptionExpire = subscriptionType(subscriptionDate);
+
+  // console.log("ReturnDate", returnDate);
+  // console.log("CurrentDate", currentDate);
+  // console.log("subscriptionDate", subscriptionDate);
+  // console.log("subscriptionDate", subscriptionExpire);
+
+  const Data = {
+    ...subscriptionDetails,
+    IsSubscriptionExpired: subscriptionExpire < currentDate,
+    daysLeftForExpire:
+      subscriptionExpire <= currentDate ? 0 : subscriptionExpire - currentDate,
+    fine:
+      returnDate < currentDate
+        ? subscriptionExpire <= currentDate
+          ? 100
+          : 50
+        : 0,
+  };
+  return res.status(200).json({
+    success: true,
+    message: "Subscription details for the user is :",
+    Data,
+  });
+});
+*/
+
+const getAllSubscriptionDetailsById = async (req, res) => {
+  const { id } = req.params; // To get id
+  const subscriptionDetails = await userModel.findById(id); // Find whether the id exist or not
+
+  if (!subscriptionDetails) {
+    return res.status(400).json({
+      success: false,
+      message: "User with the id doesnot exist",
+    });
+  }
+
+  //  To get the no of days
+  const getDateInDays = (Data = "") => {
+    // This is for getting the subscription date in days
+    let date; // Assiging a variable
+    if (Data === "") {
+      //  If we have date as blank we will consider this
+      date = new Date();
+    } else {
+      //  If we have date we will return the same date in this condition
+      date = new Date(Data);
+    }
+    // 12hr => 12*60 mins              &&           155mins => 155/60
+    let days = Math.floor(date / (1000 * 60 * 60 * 24)); // floor example:- 2.7 = 2   &&    seal example:- 2.7 = 3
+    // To convert into days  [1000ms * 60sec * 60min * 24hr]
+    return days;
+  };
+
+  const subscriptionType = (date) => {
+    // if (subscriptionDetails.subscriptionType === "Basic") {
+    //   date = date + 30;
+    // } else
+    if (subscriptionDetails.subscriptionType === "Basic") {
+      date = date + 90;
+    } else if (subscriptionDetails.subscriptionType === "Standard") {
+      date = date + 180;
+    } else if (subscriptionDetails.subscriptionType === "Premium") {
+      date = date + 365;
+    }
+    return date;
+  };
+
+  //  Jan 1 1970 UTC
+  let returnDate = getDateInDays(subscriptionDetails.returnDate);
+  let currentDate = getDateInDays();
+  let subscriptionDate = getDateInDays(subscriptionDetails.subscriptionDate);
+  let subscriptionExpire = subscriptionType(subscriptionDate);
+
+  // console.log("ReturnDate", returnDate);
+  // console.log("CurrentDate", currentDate);
+  // console.log("subscriptionDate", subscriptionDate);
+  // console.log("subscriptionDate", subscriptionExpire);
+
+  const Data = {
+    ...subscriptionDetails,
+    IsSubscriptionExpired: subscriptionExpire < currentDate,
+    daysLeftForExpire:
+      subscriptionExpire <= currentDate ? 0 : subscriptionExpire - currentDate,
+    fine:
+      returnDate < currentDate
+        ? subscriptionExpire <= currentDate
+          ? 100
+          : 50
+        : 0,
+  };
+  return res.status(200).json({
+    success: true,
+    message: "Subscription details for the user is :",
+    Data,
+  });
+};
+
+// ------------------------------------------------------------------------------------------------------
 
 module.exports = {
   getAllUsers,
@@ -269,6 +443,7 @@ module.exports = {
   addNewUser,
   updateUserById,
   deleteUserById,
+  getAllSubscriptionDetailsById,
 };
 
 // --- Another Export method ---
@@ -278,4 +453,5 @@ module.exports = {
  * exports.addNewUser = () => {};
  * exports.updateUserById = () => {};
  * exports.deleteUserById = () => {};
+ * exports.getAllSubscriptionDetailsById = () => {};
  */
